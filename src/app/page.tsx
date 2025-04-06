@@ -38,16 +38,33 @@ export default function Home() {
       });
   
       const data = await response.json();
-      const botMessage = { text: data.reply, sender: "bot" };
+  
+      // 🧠 Extract clean text from Claude's response
+      let content = "";
+  
+      if (Array.isArray(data.reply)) {
+        content = data.reply.map((item) => item.text).join("\n");
+      } else if (typeof data.reply === "object" && data.reply.text) {
+        content = data.reply.text;
+      } else {
+        content = String(data.reply);
+      }
+  
+      const botMessage = { text: content, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
+  
     } catch (err) {
       console.error("❌ API error:", err);
       setMessages((prev) => [
         ...prev,
-        { text: "Sorry, there was an error talking to the assistant.", sender: "bot" },
+        {
+          text: "Sorry, there was an error talking to the assistant.",
+          sender: "bot",
+        },
       ]);
     }
   };
+  ;
   
 
   return (
